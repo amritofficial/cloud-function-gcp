@@ -1,1 +1,2 @@
 google-cloud-storage==1.23.0
+pyyaml==5.1.2
