@@ -19,6 +19,9 @@ INVALID_FILE_NAME='INVALID_FILE_NAME'
 class ProcessFile(object):
 
     def __init__(self):
+        """
+        Act as a controller and init all the variables used throughout this class
+        """
         self.validate = Validate()
         self.storage_client = StorageClient()
         self.bucket_name = os.environ.get(BUCKET_NAME)
@@ -28,7 +31,11 @@ class ProcessFile(object):
 
 
     def process_file(self, event):
-        
+        """
+        A standard method of controller that runs all the different methods
+        The methods calls different services to get the job done
+        :param event: the file upload event that gets triggered
+        """
         if self.file_name == event['name']:
             data = self.storage_client.get_data(self.bucket_name, self.file_name)
        
