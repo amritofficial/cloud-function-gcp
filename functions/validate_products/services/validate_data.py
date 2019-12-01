@@ -5,6 +5,44 @@ UPC='upc'
 class Validate(object):   
 
 
+    def filter_valid(self, data):
+        valid = {}
+        for key in data.keys():
+            valid[key] = []
+            for value in data[key]:
+                valid_flag = self.validate_data(value)
+                if valid_flag:
+                    valid[key].append(value)
+        
+        return valid
+
+
+    def filter_invalid(self, data):
+        invalid = {}
+        for key in data.keys():
+            invalid[key] = []
+            for value in data[key]:
+                valid_flag = self.validate_data(value)
+                if not valid_flag:
+                    invalid[key].append(value)
+
+        return invalid
+
+
+    def filter_data(self, data):
+        invalid = {}
+        valid = {}
+        for key in data.keys():
+            invalid[key] = []
+            valid[key] = []
+            for value in data[key]:
+                valid_flag = self.validate_data(value)
+                if not valid_flag:
+                    invalid[key].append(value)
+                else:
+                    valid[key].append(value)
+    
+
     def validate_data(self, value):
             valid_desc = self.__validate_description(value)
             valid_price = self.__validate_price(value)

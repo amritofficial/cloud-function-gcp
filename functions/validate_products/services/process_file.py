@@ -5,47 +5,43 @@ import math
 from google.cloud import storage as gcs
 
 from services.validate_data import Validate
+from services.storage_client import StorageClient
+from shared.utils import create_temp_file_path
 
 PRODUCT_FILE_NAME='PRODUCT_FILE_NAME'
 BUCKET_NAME='BUCKET_NAME'
+VALID_PRODUCTS_BUCKET_NAME='VALID_PRODUCTS_BUCKET_NAME'
+INVALID_PRODUCTS_BUCKET_NAME='INVALID_PRODUCTS_BUCKET_NAME'
+VALID_FILE_NAME='VALID_FILE_NAME'
+INVALID_FILE_NAME='INVALID_FILE_NAME'
 
 
 class ProcessFile(object):
 
     def __init__(self):
         self.validate = Validate()
+        self.storage_client = StorageClient()
+        self.bucket_name = os.environ.get(BUCKET_NAME)
+        self.file_name = os.environ.get(PRODUCT_FILE_NAME)
+        self.valid_file_path = create_temp_file_path(os.environ.get(VALID_FILE_NAME))
+        self.invalid_file_path = create_temp_file_path(os.environ.get(INVALID_FILE_NAME))
         # self.client = gcs.Client()
 
 
     def process_file(self, event):
-        # bucket_name = os.environ.get(BUCKET_NAME)
-        # file_name = os.environ.get(PRODUCT_FILE_NAME)
         
-        # if file_name == event['name']:
-        #     bucket = self.client.get_bucket(bucket_name)
-        #     blob = bucket.get_blob(file_name)
+        if self.file_name == event['name']:
+            data = self.storage_client.get_data(self.bucket_name, self.file_name)
+       
+            valid = self.validate.filter_valid(data)
+            invalid = self.validate.filter_invalid(data)
 
-            # data = json.loads(blob.download_as_string())
-        with open(os.path.join(os.getcwd(), 'services/products.json'), 'r') as stream:
-            data = json.load(stream)
-            self.__filter_data(data)
-            # print(json.loads(file))
-            # print(data)
+            with open(self.valid_file_path, 'w') as valid_file:
+                json.dump(valid, valid_file)
+            
+            with open(self.invalid_file_path, 'w') as invalid_file:
+                json.dump(valid, invalid_file)
+
+            self.storage_client.upload_to_gcs(valid_file, invalid_file)
 
         return 'OK'
-
-
-    def __filter_data(self, data):
-        invalid = {}
-        valid = {}
-        for key in data.keys():
-            invalid[key] = []
-            valid[key] = []
-            for value in data[key]:
-                valid_flag = self.validate.validate_data(value)
-                if not valid_flag:
-                    invalid[key].append(value)
-                else:
-                    valid[key].append(value)
-
-    
