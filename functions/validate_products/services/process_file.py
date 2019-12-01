@@ -25,7 +25,6 @@ class ProcessFile(object):
         self.file_name = os.environ.get(PRODUCT_FILE_NAME)
         self.valid_file_path = create_temp_file_path(os.environ.get(VALID_FILE_NAME))
         self.invalid_file_path = create_temp_file_path(os.environ.get(INVALID_FILE_NAME))
-        # self.client = gcs.Client()
 
 
     def process_file(self, event):
@@ -42,6 +41,6 @@ class ProcessFile(object):
             with open(self.invalid_file_path, 'w') as invalid_file:
                 json.dump(valid, invalid_file)
 
-            self.storage_client.upload_to_gcs(valid_file, invalid_file)
+            self.storage_client.upload_to_gcs(self.valid_file_path, self.invalid_file_path)
 
-        return 'OK'
+        return 'File Upload Success!'
