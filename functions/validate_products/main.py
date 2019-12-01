@@ -1,11 +1,14 @@
 import os
-from services.validate_data import Validate
+from services.process_file import ProcessFile
 
-validate = Validate()
+process_file = ProcessFile()
 
 def validate_products(event, context):
-
-    response = validate.validate_data(event)
+    response = process_file.process_file(event)
 
 
     return "Hello World!" 
+
+
+if __name__ == "__main__":
+    process_file.process_file("")
